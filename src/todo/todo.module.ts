@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './entities/todo/todo';
 import { TodoService } from './services/todo/todo.service';
 import { TodoMapperService } from './services/todo-mapper/todo-mapper.service';
+import { TodoController } from './controllers/todo/todo.controller';
 
 @Module({
     imports: [
@@ -17,6 +18,6 @@ import { TodoMapperService } from './services/todo-mapper/todo-mapper.service';
         TypeOrmModule.forFeature([Todo])
     ],
     providers: [TodoService, TodoMapperService],
-    controllers: []
+    controllers: [TodoController]
 })
 export class TodoModule { }

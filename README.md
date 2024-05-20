@@ -303,7 +303,7 @@ export class TodoDto {
 In our specific case, Partial<AddTodoDto> indicates that the object passed to the constructor of the AddTodoDto class can have only some of the properties defined in the AddTodoDto class, and these properties can be optional rather than mandatory.
 The *** Object.assign()*** static method copies all enumerable own properties from one or more source objects to a target object. It returns the modified target object.
 
-## SERVICES
+## Services
 Services contain our app business logic, giving us a defined set of features (like the methods findAll, findOne, add, edit e delete).
 
 We will create a service that maps a Todo (***src/todo/entities/todo/todo.ts***) class and converts it into a TodoDto Class (***src/todo/dto/todo.dto.ts***), converting a database entity to a data transfer object.
@@ -339,7 +339,7 @@ TodoMapper has the @Injectable() decoration, so we will be able to inject it on 
 nest generate service todo/services/todo
 ```
 
-The command will scaffold the ***todo.service-ts*** file.
+The command will scaffold the ***todo.service.ts*** file.
 
 ```ts
 // src/todo/services/todo/todo.service.ts
@@ -418,7 +418,7 @@ export class TodoService {
         return this.todoMapper.modelToDto(todo);
     }
 
-    // DELETE
+    // DESTROY
     public async remove(id): Promise<Todo> {
         let todo = await this.todoRepository.findOne(id);
 
@@ -427,6 +427,86 @@ export class TodoService {
         todo = await this.todoRepository.remove(todo);
 
         return todo;
+    }
+
+}
+```
+
+## Controller
+
+Create the controller using CLI
+
+```bash
+nest generate controller todo/controllers/todo
+```
+
+The command will scaffold the ***todo.controller.ts*** file.
+
+```ts
+// src/todo/controllers/todo/todo.controller.ts
+
+import { Controller } from '@nestjs/common';
+
+@Controller('todo')
+export class TodoController {}
+```
+
+Implement the CRUD methods in the controller, calling the ***todoService*** methods
+
+```ts
+// src/todo/controllers/todo/todo.controller.ts
+
+// Import TodoService
+import { TodoService } from 'src/todo/services/todo/todo.service';
+
+// Imports DTOs
+import { TodoDto } from '../../dto/todo.dto';
+import { AddTodoDto } from '../../dto/add-todo.dto';
+import { EditTodoDto } from '../../dto/edit-todo.dto';
+
+import {
+    Controller,
+
+    // Import decorators for handling HTTP requests
+    Get, Post, Body, Put, Param, Delete
+} from '@nestjs/common';
+
+
+@Controller('todo')
+export class TodoController {
+
+    public constructor(private readonly todoService: TodoService) { }
+
+    // INDEX
+    @Get()
+    // // Returns a Promise that represents the completion of an asynchronous operation, resolving with an array of TodoDto objects.
+    public findAll(): Promise<TodoDto[]> {
+        // Invokes the findAll() method of the todoService to retrieve all TodoDto objects.
+        return this.todoService.findAll();
+    }
+
+    // SHOW
+    @Get(':id')
+    public findOne(@Param('id') id: number): Promise<TodoDto> {
+        return this.todoService.findOne(id);
+    }
+
+    // EDIT
+    @Put(':id')
+    public edit(@Param('id') id: number, @Body() todo: EditTodoDto): Promise<TodoDto> {
+        return this.todoService.edit(id, todo);
+    }
+
+    // CREATE
+    @Post()
+    public add(@Body() todo: AddTodoDto): Promise<TodoDto> {
+        return this.todoService.add(todo);
+    }
+
+    // DESTROY
+    @Delete(':id')
+    public remove(@Param('id') id: number): Promise<TodoDto> {
+        return this.todoService.remove(id);
     }
 
 }

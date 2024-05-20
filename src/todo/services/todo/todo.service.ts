@@ -63,7 +63,7 @@ export class TodoService {
         return this.todoMapper.modelToDto(todo);
     }
 
-    // DELETE
+    // DESTROY
     public async remove(id): Promise<Todo> {
         let todo = await this.todoRepository.findOne(id);
 

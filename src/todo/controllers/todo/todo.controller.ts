@@ -15,7 +15,7 @@ import {
     Get, Post, Body, Put, Param, Delete
 } from '@nestjs/common';
 
-
+// The @Controller('todo') decorator sets the base path for all routes defined within this controller to '/todo' (ex: http://localhost:3000/todo/).
 @Controller('todo')
 export class TodoController {
 

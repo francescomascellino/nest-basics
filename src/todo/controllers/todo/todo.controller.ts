@@ -12,7 +12,7 @@ import {
     Controller,
 
     // Import decorators for handling HTTP requests
-    Get, Post, Body, Put, Param, Delete
+    Get, Post, Body, Put, Param, Delete, ParseIntPipe
 } from '@nestjs/common';
 
 // The @Controller('todo') decorator sets the base path for all routes defined within this controller to '/todo' (ex: http://localhost:3000/todo/).
@@ -31,13 +31,16 @@ export class TodoController {
 
     // SHOW
     @Get(':id')
-    public findOne(@Param('id') id: number): Promise<TodoDto> {
+    // ParseIntPipe si assicura di convertire evebtuali stringe in numeri
+    public findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoDto> {
+        console.log(`Controller received id: ${id}`);
         return this.todoService.findOne(id);
     }
 
     // EDIT
     @Put(':id')
-    public edit(@Param('id') id: number, @Body() todo: EditTodoDto): Promise<TodoDto> {
+    public edit(@Param('id', ParseIntPipe) id: number, @Body() todo: EditTodoDto): Promise<TodoDto> {
+        console.log(`Controller received id: ${id}`);
         return this.todoService.edit(id, todo);
     }
 

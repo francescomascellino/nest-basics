@@ -36,10 +36,24 @@ export class TodoService {
     }
 
     // SHOW
-    public async findOne(id): Promise<TodoDto> {
-        const todo = await this.todoRepository.findOne(id);
-        if (!todo) throw new NotFoundException();
+    public async findOne(id: number): Promise<TodoDto> {
+
+        // SELECT * FROM todo WHERE id = ?
+        const todo = await this.todoRepository.findOne(
+            {
+                where: {
+                    id
+                }
+            }
+        );
+
+        if (!todo) throw new NotFoundException(`Todo with id ${id} not found`);
+
         return this.todoMapper.modelToDto(todo);
+
+    } catch(error) {
+        console.error('Error in findOne service method:', error);
+        throw new Error('Internal server error');
     }
 
     // CREATE
@@ -50,8 +64,17 @@ export class TodoService {
     }
 
     // EDIT
-    public async edit(id, { title, completed }: EditTodoDto): Promise<TodoDto> {
-        let todo = await this.todoRepository.findOne(id);
+    public async edit(id: number, { title, completed }: EditTodoDto): Promise<TodoDto> {
+
+        let todo = await this.todoRepository.findOne(
+            {
+                where: {
+                    id
+                }
+            }
+        );
+
+        console.log(todo);
 
         if (!todo) throw new NotFoundException();
 
@@ -64,8 +87,14 @@ export class TodoService {
     }
 
     // DESTROY
-    public async remove(id): Promise<Todo> {
-        let todo = await this.todoRepository.findOne(id);
+    public async remove(id: number): Promise<Todo> {
+        let todo = await this.todoRepository.findOne(
+            {
+                where: {
+                    id
+                }
+            }
+        );
 
         if (!todo) throw new NotFoundException();
 

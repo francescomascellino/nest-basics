@@ -391,10 +391,24 @@ export class TodoService {
     }
 
     // SHOW
-    public async findOne(id): Promise<TodoDto> {
-        const todo = await this.todoRepository.findOne(id);
-        if (!todo) throw new NotFoundException();
+    public async findOne(id: number): Promise<TodoDto> {
+
+        // SELECT * FROM todo WHERE id = ?
+        const todo = await this.todoRepository.findOne(
+            {
+                where: {
+                    id
+                }
+            }
+        );
+
+        if (!todo) throw new NotFoundException(`Todo with id ${id} not found`);
+
         return this.todoMapper.modelToDto(todo);
+
+    } catch(error) {
+        console.error('Error in findOne service method:', error);
+        throw new Error('Internal server error');
     }
 
     // CREATE
@@ -405,8 +419,17 @@ export class TodoService {
     }
 
     // EDIT
-    public async edit(id, { title, completed }: EditTodoDto): Promise<TodoDto> {
-        let todo = await this.todoRepository.findOne(id);
+    public async edit(id: number, { title, completed }: EditTodoDto): Promise<TodoDto> {
+
+        let todo = await this.todoRepository.findOne(
+            {
+                where: {
+                    id
+                }
+            }
+        );
+
+        console.log(todo);
 
         if (!todo) throw new NotFoundException();
 
@@ -488,13 +511,16 @@ export class TodoController {
 
     // SHOW
     @Get(':id')
-    public findOne(@Param('id') id: number): Promise<TodoDto> {
+    // ParseIntPipe si assicura di convertire evebtuali stringe in numeri
+    public findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoDto> {
+        console.log(`Controller received id: ${id}`);
         return this.todoService.findOne(id);
     }
 
     // EDIT
     @Put(':id')
-    public edit(@Param('id') id: number, @Body() todo: EditTodoDto): Promise<TodoDto> {
+    public edit(@Param('id', ParseIntPipe) id: number, @Body() todo: EditTodoDto): Promise<TodoDto> {
+        console.log(`Controller received id: ${id}`);
         return this.todoService.edit(id, todo);
     }
 
@@ -506,7 +532,7 @@ export class TodoController {
 
     // DESTROY
     @Delete(':id')
-    public remove(@Param('id') id: number): Promise<TodoDto> {
+    public remove(@Param('id', ParseIntPipe) id: number): Promise<TodoDto> {
         return this.todoService.remove(id);
     }
 

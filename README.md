@@ -11,7 +11,7 @@
 
 ```bash
 npm i -g @nestjs/cli
-nest new project-name
+nest new [project-name]
 ```
 
 ```bash
@@ -49,11 +49,11 @@ npm run test:cov
 ```bash
 nest g # generate
 
-nest g module moduleName # generates a module named "moduleName"
+nest g module [moduleName] # generates a module named "moduleName"
 
-nest g controller controllerName # generates a controller named "controllerName"
+nest g controller [controllerName] # generates a controller named "controllerName"
 
-nest g service serviceName # generates a service named "serviceName"
+nest g service [serviceName] # generates a service named "serviceName"
 
 # add --no-spec to skip tests scaffolding
 ```
@@ -543,3 +543,28 @@ export class TodoController {
 }
 ```
 
+## Generating a new resource
+To create a new resource, simply run the following command in the root directory of your project:
+
+```bash
+$ nest g resource [resourceName]
+```
+
+The command not only generates all the NestJS building blocks (module, service, controller classes) but also an entity class, DTO classes as well as the testing (.spec) files and will import the module in ***AppModule***.
+
+```bash
+$ nest g resource test/test/
+```
+
+will generate:
+
+```bash
+CREATE src/test/test/test.controller.ts (917 bytes)
+CREATE src/test/test/test.controller.spec.ts (576 bytes)
+CREATE src/test/test/test.module.ts (250 bytes)
+CREATE src/test/test/test.service.ts (633 bytes)
+CREATE src/test/test/test.service.spec.ts (464 bytes)
+CREATE src/test/test/dto/create-test.dto.ts (31 bytes)
+CREATE src/test/test/dto/update-test.dto.ts (173 bytes)
+CREATE src/test/test/entities/test.entity.ts (22 bytes)
+```

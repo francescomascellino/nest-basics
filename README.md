@@ -253,6 +253,7 @@ export class Todo {
 
 ## DTO
 A DTO is a data transfer object that is used to transfer data between ors services.
+ A DTO is an object that defines how the data will be sent over the network.
 
 ```ts
 // src/todo/dto/add-todo.dto.ts
@@ -300,8 +301,11 @@ export class TodoDto {
 ```
 
 ***Partial*** is a TS type that makes partially optional our class/interface properties.
-In our specific case, Partial<AddTodoDto> indicates that the object passed to the constructor of the AddTodoDto class can have only some of the properties defined in the AddTodoDto class, and these properties can be optional rather than mandatory.
+In our specific case, ***Partial<AddTodoDto>*** indicates that the object passed to the constructor of the ***AddTodoDto*** class can have only some of the properties defined in the ***AddTodoDto*** class, and these properties can be optional rather than mandatory.
+We need Partial in the ***add-todo.dto.ts*** becuse we have not to the fine the completed property as it will be false by default, and we need it in the ***edit-todo.dto.ts*** because we could edit only one of the properties.
+
 The *** Object.assign()*** static method copies all enumerable own properties from one or more source objects to a target object. It returns the modified target object.
+
 
 ## Services
 Services contain our app business logic, giving us a defined set of features (like the methods findAll, findOne, add, edit e delete).

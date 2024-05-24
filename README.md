@@ -570,3 +570,184 @@ CREATE src/testResource/test/dto/create-test.dto.ts (31 bytes)
 CREATE src/testResource/test/dto/update-test.dto.ts (173 bytes)
 CREATE src/testResource/test/entities/test.entity.ts (22 bytes)
 ```
+
+## MongoDB
+Import MongoDB package
+```bash
+npm install @nestjs/mongoose mongoose
+```
+
+***src/app.module.ts***
+
+```ts
+// src/app.module.ts
+
+// Import Mongo
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TodoModule } from './todo/todo.module';
+
+@Module({
+    imports: [
+
+    // Configure MongoDB connection
+    MongooseModule.forRoot({
+        uri: 'mongodb://localhost:27017/your_database_name', // Sostituisci con la tua stringa di connessione a MongoDB
+        dbName: 'your_database_name', // Sostituisci con il nome del tuo database
+    }),
+    TodoModule
+    ],
+    controllers: [AppController],
+    providers: [AppService],
+})
+export class AppModule {}
+```
+
+We define a Schema in our entity file:
+
+```bash
+nest g ts-schema todo/entities/todo/todo
+```
+
+this will create
+
+```ts
+// src/todo/entities/todo/todo.schema.ts
+
+// We do not use TypeORM decorators:
+// import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'; 
+
+// But we use Mongoose
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+@Schema()
+export class Todo {
+
+    @Prop()
+    public id: string; // Assumiamo che l'ID sia una stringa in MongoDB
+
+    // We can add validation in the Prop() decorator
+    @Prop({ required: true, maxlength: 50, minlength: 3 })
+    public title: string;
+
+    @Prop({ maxlength: 300 })
+    public description?: string;
+
+    @Prop()
+    public completed: boolean;
+
+    public constructor(title: string, description?: string) {
+        this.title = title;
+        this.description = description;
+        this.completed = false;
+    }
+}
+
+// We export a Schema!
+export const TodoSchema = SchemaFactory.createForClass(Todo);
+```
+
+We have to write our queries in ***src/todo/services/todo/todo.service.ts*** using Mongoose API:
+
+```ts
+// src/todo/services/todo/todo.service.ts
+
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
+
+// We do not need TypeORM
+// import { Repository } from 'typeorm'; 
+// import { Todo } from '../../entities/todo/todo';
+
+// But we use our Schema
+import { TodoSchema } from '../../entities/todo/todo.schema';
+
+// Imports TodoMapperService
+import { TodoMapperService } from '../todo-mapper/todo-mapper.service';
+
+@Injectable()
+export class TodoService {
+    constructor(
+        @InjectModel(TodoSchema.name) private readonly todoModel: Model<Todo>,
+        private readonly todoMapper: TodoMapperService,
+    ) { }
+
+    // ... other methods
+
+    // findOne example
+    public async findOne(id: string): Promise<TodoDto> {
+
+        const todo = await this.todoModel.findById(id);
+
+        if (!todo) throw new NotFoundException(`Todo with id "${id}" not found`);
+
+        return this.todoMapper.modelToDto(todo);
+    }
+
+    // ... other methods
+
+}
+```
+
+differences between the sql and the nosql findOne methods:
+
+```ts
+public async findOne(id: number): Promise<TodoDto> {
+sql
+    // SELECT * FROM todo WHERE id = ?
+    const todo = await this.todoRepository.findOne(
+        {
+            where: {
+                id
+            }
+        }
+    );
+
+    if (!todo) throw new NotFoundException(`Todo with id ${id} not found`);
+
+    return this.todoMapper.modelToDto(todo);
+
+}
+```
+
+no sql
+
+```ts
+public async findOne(id: string): Promise<TodoDto> {
+
+    const todo = await this.todoModel.findById(id);
+
+    if (!todo) throw new NotFoundException(`Todo with id "${id}" not found`);
+
+    return this.todoMapper.modelToDto(todo);
+}
+```
+
+Our TodoMapperService ***src/services/todo-mapper/todo-mapper.service.ts*** should be edited.
+We don't need to import the Todo class from the TypeORM entity file. The TodoMapperService can directly work with the data it receives, assuming it aligns with the structure defined in the TodoSchema. (CHECK)
+
+```ts
+import { Injectable } from '@nestjs/common';
+
+// we do not need to import an entity
+// import { Todo } from '../../entities/todo/todo'
+
+// Import TodoDto Class
+import { TodoDto } from '../../dto/todo.dto';
+
+@Injectable()
+export class TodoMapperService {
+
+    // Maps a Todo object (which aligns with TodoSchema) to a TodoDto object.
+    public modelToDto({ id, title, completed }: any): TodoDto {
+    return new TodoDto({ id, title, completed });
+    }
+
+}
+```

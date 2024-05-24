@@ -88,7 +88,7 @@ The ***@Module*** decorator is used to define the module's metadata, such as its
 export class TodoModule {}
 ```
 
-In this case, we  have not specified any imports or exports, so the module will not have any dependencies or be exported to other modules.
+In this case, we  have not specified any imports or exports, so the module will not have any dependencies or be exported to other modules (we will add them later).
 
 ## Entities
 
@@ -138,6 +138,8 @@ import { TodoModule } from './todo/todo.module';
 })
 export class AppModule { }
 ```
+
+**Shaerd Modules:** https://docs.nestjs.com/modules#shared-modules
 
 In this guide we will use TypeOrm as ORM and squlite3
 
@@ -304,10 +306,10 @@ export class TodoDto {
 In our specific case, ***Partial<AddTodoDto>*** indicates that the object passed to the constructor of the ***AddTodoDto*** class can have only some of the properties defined in the ***AddTodoDto*** class, and these properties can be optional rather than mandatory.
 We need Partial in the ***add-todo.dto.ts*** becuse we have not to the fine the completed property as it will be false by default, and we need it in the ***edit-todo.dto.ts*** because we could edit only one of the properties.
 
-The *** Object.assign()*** static method copies all enumerable own properties from one or more source objects to a target object. It returns the modified target object.
+The ***Object.assign()*** static method copies all enumerable own properties from one or more source objects to a target object. It returns the modified target object.
 
 
-## Services
+## Services Providers
 Services contain our app business logic, giving us a defined set of features (like the methods findAll, findOne, add, edit e delete).
 
 We will create a service that maps a Todo (***src/todo/entities/todo/todo.ts***) class and converts it into a TodoDto Class (***src/todo/dto/todo.dto.ts***), converting a database entity to a data transfer object.
@@ -553,18 +555,18 @@ $ nest g resource [resourceName]
 The command not only generates all the NestJS building blocks (module, service, controller classes) but also an entity class, DTO classes as well as the testing (.spec) files and will import the module in ***AppModule***.
 
 ```bash
-$ nest g resource test/test/
+$ nest g resource testResource/test/
 ```
 
 will generate:
 
 ```bash
-CREATE src/test/test/test.controller.ts (917 bytes)
-CREATE src/test/test/test.controller.spec.ts (576 bytes)
-CREATE src/test/test/test.module.ts (250 bytes)
-CREATE src/test/test/test.service.ts (633 bytes)
-CREATE src/test/test/test.service.spec.ts (464 bytes)
-CREATE src/test/test/dto/create-test.dto.ts (31 bytes)
-CREATE src/test/test/dto/update-test.dto.ts (173 bytes)
-CREATE src/test/test/entities/test.entity.ts (22 bytes)
+CREATE src/testResource/test/test.controller.ts (917 bytes)
+CREATE src/testResource/test/test.controller.spec.ts (576 bytes)
+CREATE src/testResource/test/test.module.ts (250 bytes)
+CREATE src/testResource/test/test.service.ts (633 bytes)
+CREATE src/testResource/test/test.service.spec.ts (464 bytes)
+CREATE src/testResource/test/dto/create-test.dto.ts (31 bytes)
+CREATE src/testResource/test/dto/update-test.dto.ts (173 bytes)
+CREATE src/testResource/test/entities/test.entity.ts (22 bytes)
 ```

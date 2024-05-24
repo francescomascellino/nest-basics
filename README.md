@@ -628,14 +628,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 export class Todo {
 
     @Prop()
-    public id: string; // Assumiamo che l'ID sia una stringa in MongoDB
+    public id: string; // MongoDb uses string ids
 
     // We can add validation in the Prop() decorator
     @Prop({ required: true, maxlength: 50, minlength: 3 })
     public title: string;
-
-    @Prop({ maxlength: 300 })
-    public description?: string;
 
     @Prop()
     public completed: boolean;
